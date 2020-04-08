@@ -52,13 +52,10 @@ impl<'a> Watcher<'a> for LogWatcher<'a> {
     fn watch(&mut self) {
         let mut line = String::new();
         loop {
-            match self.read_line(&mut line) {
-                Ok(_) => (),
-                Err(e) => {
-                    eprintln!("ERROR: {}", e);
-                    sleep(PERIOD);
-                }
-            };
+            if let Err(e) = self.read_line(&mut line) {
+                eprintln!("ERROR: {}", e);
+                sleep(PERIOD);
+            }
             self.execute_callbacks(&line);
         }
     }
