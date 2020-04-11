@@ -12,7 +12,7 @@ pub struct LogWatcher<'a> {
     pos: u64,
     reader: Option<BufReader<File>>,
     initial: bool,
-    callbacks: Vec<&'a dyn Fn(String)>,
+    callbacks: Vec<Box<dyn Fn(String) + 'a>>,
 }
 
 impl<'a> Default for LogWatcher<'a> {
@@ -72,8 +72,7 @@ impl<'a> LogWatcher<'a> {
     fn process_all_lines(&mut self) {
         let mut line = String::new();
         loop {
-            let resp = self.read_line(&mut line);
-            match resp {
+            match self.read_line(&mut line) {
                 Ok(0) => break,
                 Ok(len) => {
                     self.pos += len as u64;
@@ -97,8 +96,8 @@ impl<'a> Watcher<'a> for LogWatcher<'a> {
         watcher
     }
 
-    fn register<F: Fn(String)>(&mut self, callback: &'a F) {
-        self.callbacks.push(callback);
+    fn register<F: Fn(String) + 'a>(&mut self, callback: F) {
+        self.callbacks.push(Box::new(callback));
     }
 
     fn watch(&mut self) {

@@ -13,7 +13,7 @@ fn main() -> Result<(), io::Error> {
         .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "usage: logwatch /path/to/log"))?;
     let mut watcher = LogWatcher::new(fpath);
 
-    watcher.register(&|line: String| {
+    watcher.register(|line: String| {
         println!("{}", line);
     });
 

@@ -8,7 +8,7 @@ use crate::{Watcher, PERIOD};
 pub struct LogWatcher<'a> {
     cmd: process::Child,
     reader: BufReader<process::ChildStdout>,
-    callbacks: Vec<&'a dyn Fn(String)>,
+    callbacks: Vec<Box<dyn Fn(String) + 'a>>,
 }
 
 impl<'a> LogWatcher<'a> {
@@ -45,8 +45,8 @@ impl<'a> Watcher<'a> for LogWatcher<'a> {
         }
     }
 
-    fn register<F: Fn(String)>(&mut self, callback: &'a F) {
-        self.callbacks.push(callback);
+    fn register<F: Fn(String) + 'a>(&mut self, callback: F) {
+        self.callbacks.push(Box::new(callback));
     }
 
     fn watch(&mut self) {
