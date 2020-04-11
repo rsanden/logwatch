@@ -5,13 +5,13 @@ use std::thread::sleep;
 
 use crate::{Watcher, PERIOD};
 
-pub struct LogWatcher<'a> {
+pub struct TailWatcher<'a> {
     cmd: process::Child,
     reader: BufReader<process::ChildStdout>,
     callbacks: Vec<Box<dyn Fn(String) + 'a>>,
 }
 
-impl<'a> LogWatcher<'a> {
+impl<'a> TailWatcher<'a> {
     fn read_line(&mut self, mut line: &mut String) -> Result<usize, io::Error> {
         line.clear();
         self.reader.read_line(&mut line)
@@ -28,7 +28,7 @@ impl<'a> LogWatcher<'a> {
     }
 }
 
-impl<'a> Watcher<'a> for LogWatcher<'a> {
+impl<'a> Watcher<'a> for TailWatcher<'a> {
     fn new(filename: String) -> Self {
         let mut cmd = Command::new("tail")
             .args(&["--silent", "-n", "0", "-F", &filename])
@@ -38,7 +38,7 @@ impl<'a> Watcher<'a> for LogWatcher<'a> {
             .spawn()
             .unwrap();
         let reader = BufReader::new(cmd.stdout.take().unwrap());
-        LogWatcher {
+        TailWatcher {
             cmd,
             reader,
             callbacks: vec![],

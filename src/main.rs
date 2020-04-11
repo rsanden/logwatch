@@ -4,8 +4,8 @@ use std::io;
 use logwatch::Watcher;
 
 //-- Choose an implementation --
-use logwatch::pollwatch::LogWatcher;
-//use logwatch::tailwatch::LogWatcher;
+use logwatch::PollWatcher as LogWatcher;
+//use logwatch::TailWatcher as LogWatcher;
 
 fn main() -> Result<(), io::Error> {
     let fpath = env::args()
@@ -13,11 +13,10 @@ fn main() -> Result<(), io::Error> {
         .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "usage: logwatch /path/to/log"))?;
     let mut watcher = LogWatcher::new(fpath);
 
-    watcher.register(|line: String| {
+    let callback = |line: String| {
         println!("{}", line);
-    });
-
+    };
+    watcher.register(callback);
     watcher.watch();
-
     Ok(())
 }

@@ -3,5 +3,10 @@ name = "logwatch"
 version = "0.1.0"
 authors = ["Ryan Sanden <ryan@ryansanden.com>"]
 edition = "2018"
+license = "Apache-2.0"
+keywords = ["log", "watcher", "tail"]
+description = "A library to watch rotated logfiles (like 'tail -F') and execute callbacks"
+readme = "README.md"
+homepage = "https://github.com/rsanden/logwatch"
 
 [dependencies]

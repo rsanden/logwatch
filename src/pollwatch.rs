@@ -6,7 +6,7 @@ use std::thread::sleep;
 
 use crate::{Watcher, PERIOD};
 
-pub struct LogWatcher<'a> {
+pub struct PollWatcher<'a> {
     filename: String,
     inode: u64,
     pos: u64,
@@ -15,9 +15,9 @@ pub struct LogWatcher<'a> {
     callbacks: Vec<Box<dyn Fn(String) + 'a>>,
 }
 
-impl<'a> Default for LogWatcher<'a> {
+impl<'a> Default for PollWatcher<'a> {
     fn default() -> Self {
-        LogWatcher {
+        PollWatcher {
             filename: String::new(),
             inode: 0,
             pos: 0,
@@ -28,7 +28,7 @@ impl<'a> Default for LogWatcher<'a> {
     }
 }
 
-impl<'a> LogWatcher<'a> {
+impl<'a> PollWatcher<'a> {
     fn seek(&mut self) {
         self.reader
             .as_mut()
@@ -89,9 +89,9 @@ impl<'a> LogWatcher<'a> {
     }
 }
 
-impl<'a> Watcher<'a> for LogWatcher<'a> {
+impl<'a> Watcher<'a> for PollWatcher<'a> {
     fn new(filename: String) -> Self {
-        let mut watcher = LogWatcher::default();
+        let mut watcher = PollWatcher::default();
         watcher.filename = filename;
         watcher
     }

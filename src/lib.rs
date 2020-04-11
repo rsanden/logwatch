@@ -9,3 +9,6 @@ pub trait Watcher<'a> {
 
 pub mod pollwatch;
 pub mod tailwatch;
+
+pub use pollwatch::PollWatcher;
+pub use tailwatch::TailWatcher;
