@@ -1,6 +1,5 @@
 use std::env;
 use std::io;
-use std::time::Duration;
 
 use logwatch::Watcher;
 
@@ -21,7 +20,7 @@ fn main() -> Result<(), io::Error> {
         .nth(1)
         .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "usage: logwatch /path/to/log"))?;
     let mut count = 0;
-    let mut watcher = LogWatcher::new(&fpath, Duration::from_millis(2000));
+    let mut watcher = LogWatcher::new(&fpath, 2000); // polling period = 2000 milliseconds
     let callback = factory(&mut count);
     watcher.register(callback);
     watcher.watch();

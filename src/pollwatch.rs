@@ -78,14 +78,14 @@ impl<'a> PollWatcher<'a> {
 }
 
 impl<'a> Watcher<'a> for PollWatcher<'a> {
-    fn new(filename: &str, period: Duration) -> Self {
+    fn new(filename: &str, period_milliseconds: u64) -> Self {
         PollWatcher {
             filename: filename.to_string(),
             inode: 0,
             pos: 0,
             reader: None,
             initial: true,
-            period,
+            period: Duration::from_millis(period_milliseconds),
             callbacks: vec![],
         }
     }

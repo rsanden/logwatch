@@ -30,7 +30,7 @@ impl<'a> TailWatcher<'a> {
 }
 
 impl<'a> Watcher<'a> for TailWatcher<'a> {
-    fn new(filename: &str, period: Duration) -> Self {
+    fn new(filename: &str, period_milliseconds: u64) -> Self {
         let mut cmd = Command::new("tail")
             .args(&["--silent", "-n", "0", "-F", filename])
             .stdin(Stdio::null())
@@ -42,7 +42,7 @@ impl<'a> Watcher<'a> for TailWatcher<'a> {
         TailWatcher {
             cmd,
             reader,
-            period,
+            period: Duration::from_millis(period_milliseconds),
             callbacks: vec![],
         }
     }
