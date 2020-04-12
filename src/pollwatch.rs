@@ -12,7 +12,7 @@ pub struct PollWatcher<'a> {
     pos: u64,
     reader: Option<BufReader<File>>,
     initial: bool,
-    callbacks: Vec<Box<dyn Fn(String) + 'a>>,
+    callbacks: Vec<Box<dyn FnMut(String) + 'a>>,
 }
 
 impl<'a> Default for PollWatcher<'a> {
@@ -64,7 +64,7 @@ impl<'a> PollWatcher<'a> {
     }
 
     fn execute_callbacks(&mut self, line: &str) {
-        for callback in &self.callbacks {
+        for callback in &mut self.callbacks {
             callback(line.replace("\n", ""));
         }
     }
@@ -96,8 +96,8 @@ impl<'a> Watcher<'a> for PollWatcher<'a> {
         watcher
     }
 
-    fn register<F: Fn(String) + 'a>(&mut self, callback: F) {
-        self.callbacks.push(Box::new(callback));
+    fn register(&mut self, callback: Box<dyn FnMut(String) + 'a>) {
+        self.callbacks.push(callback);
     }
 
     fn watch(&mut self) {

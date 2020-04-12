@@ -8,7 +8,7 @@ use crate::{Watcher, PERIOD};
 pub struct TailWatcher<'a> {
     cmd: process::Child,
     reader: BufReader<process::ChildStdout>,
-    callbacks: Vec<Box<dyn Fn(String) + 'a>>,
+    callbacks: Vec<Box<dyn FnMut(String) + 'a>>,
 }
 
 impl<'a> TailWatcher<'a> {
@@ -18,7 +18,7 @@ impl<'a> TailWatcher<'a> {
     }
 
     fn execute_callbacks(&mut self, line: &str) {
-        for callback in &self.callbacks {
+        for callback in &mut self.callbacks {
             callback(line.replace("\n", ""));
         }
     }
@@ -45,8 +45,8 @@ impl<'a> Watcher<'a> for TailWatcher<'a> {
         }
     }
 
-    fn register<F: Fn(String) + 'a>(&mut self, callback: F) {
-        self.callbacks.push(Box::new(callback));
+    fn register(&mut self, callback: Box<dyn FnMut(String) + 'a>) {
+        self.callbacks.push(callback);
     }
 
     fn watch(&mut self) {

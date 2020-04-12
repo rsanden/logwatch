@@ -3,7 +3,7 @@ pub const PERIOD: Duration = Duration::from_millis(2000);
 
 pub trait Watcher<'a> {
     fn new(filename: String) -> Self;
-    fn register<F: Fn(String) + 'a>(&mut self, callback: F);
+    fn register(&mut self, callback: Box<dyn FnMut(String) + 'a>);
     fn watch(&mut self);
 }
 
