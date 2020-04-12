@@ -6,10 +6,11 @@ use std::process::{Command, Stdio};
 use std::thread::sleep;
 use std::time::Duration;
 
-use logwatch::PERIOD;
-
 const PROG_PATH: &'static str = "target/debug/logwatch";
 const MIN_DELAY: Duration = Duration::from_millis(50);
+
+// Synchronize with LogWatcher period main.rs
+const PERIOD: Duration = Duration::from_millis(2000);
 
 fn sleep_with_minimum(delay: Duration) {
     let mut delay = delay;

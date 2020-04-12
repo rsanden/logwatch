@@ -1,13 +1,14 @@
+use crate::Watcher;
 use std::io::prelude::*;
 use std::io::{self, BufReader};
 use std::process::{self, Command, Stdio};
 use std::thread::sleep;
-
-use crate::{Watcher, PERIOD};
+use std::time::Duration;
 
 pub struct TailWatcher<'a> {
     cmd: process::Child,
     reader: BufReader<process::ChildStdout>,
+    period: Duration,
     callbacks: Vec<Box<dyn FnMut(String) + 'a>>,
 }
 
@@ -29,9 +30,9 @@ impl<'a> TailWatcher<'a> {
 }
 
 impl<'a> Watcher<'a> for TailWatcher<'a> {
-    fn new(filename: String) -> Self {
+    fn new(filename: &str, period: Duration) -> Self {
         let mut cmd = Command::new("tail")
-            .args(&["--silent", "-n", "0", "-F", &filename])
+            .args(&["--silent", "-n", "0", "-F", filename])
             .stdin(Stdio::null())
             .stdout(Stdio::piped())
             .stderr(Stdio::null())
@@ -41,6 +42,7 @@ impl<'a> Watcher<'a> for TailWatcher<'a> {
         TailWatcher {
             cmd,
             reader,
+            period,
             callbacks: vec![],
         }
     }
@@ -54,7 +56,7 @@ impl<'a> Watcher<'a> for TailWatcher<'a> {
         loop {
             if let Err(e) = self.read_line(&mut line) {
                 eprintln!("ERROR: {}", e);
-                sleep(PERIOD);
+                sleep(self.period);
             }
             self.execute_callbacks(&line);
         }

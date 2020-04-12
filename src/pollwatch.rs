@@ -1,10 +1,10 @@
+use crate::Watcher;
 use std::fs::{self, File};
 use std::io::prelude::*;
 use std::io::{self, BufReader};
 use std::os::unix::fs::MetadataExt;
 use std::thread::sleep;
-
-use crate::{Watcher, PERIOD};
+use std::time::Duration;
 
 pub struct PollWatcher<'a> {
     filename: String,
@@ -12,20 +12,8 @@ pub struct PollWatcher<'a> {
     pos: u64,
     reader: Option<BufReader<File>>,
     initial: bool,
+    period: Duration,
     callbacks: Vec<Box<dyn FnMut(String) + 'a>>,
-}
-
-impl<'a> Default for PollWatcher<'a> {
-    fn default() -> Self {
-        PollWatcher {
-            filename: String::new(),
-            inode: 0,
-            pos: 0,
-            reader: None,
-            initial: true,
-            callbacks: vec![],
-        }
-    }
 }
 
 impl<'a> PollWatcher<'a> {
@@ -81,7 +69,7 @@ impl<'a> PollWatcher<'a> {
                 }
                 Err(e) => {
                     eprintln!("ERROR: {}", e);
-                    sleep(PERIOD);
+                    sleep(self.period);
                     break;
                 }
             }
@@ -90,10 +78,16 @@ impl<'a> PollWatcher<'a> {
 }
 
 impl<'a> Watcher<'a> for PollWatcher<'a> {
-    fn new(filename: String) -> Self {
-        let mut watcher = PollWatcher::default();
-        watcher.filename = filename;
-        watcher
+    fn new(filename: &str, period: Duration) -> Self {
+        PollWatcher {
+            filename: filename.to_string(),
+            inode: 0,
+            pos: 0,
+            reader: None,
+            initial: true,
+            period,
+            callbacks: vec![],
+        }
     }
 
     fn register(&mut self, callback: Box<dyn FnMut(String) + 'a>) {
@@ -102,7 +96,7 @@ impl<'a> Watcher<'a> for PollWatcher<'a> {
 
     fn watch(&mut self) {
         loop {
-            sleep(PERIOD);
+            sleep(self.period);
             if self.ready().is_ok() {
                 self.process_all_lines();
             }
