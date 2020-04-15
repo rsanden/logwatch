@@ -1,4 +1,5 @@
 use crate::Watcher;
+use log::warn;
 use std::fs::{self, File};
 use std::io::prelude::*;
 use std::io::{self, BufReader};
@@ -68,7 +69,7 @@ impl<'a> PollWatcher<'a> {
                     self.execute_callbacks(&line);
                 }
                 Err(e) => {
-                    eprintln!("ERROR: {}", e);
+                    warn!("unable to read line: {}", e);
                     sleep(self.period);
                     break;
                 }

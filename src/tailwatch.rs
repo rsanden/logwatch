@@ -1,4 +1,5 @@
 use crate::Watcher;
+use log::warn;
 use std::io::prelude::*;
 use std::io::{self, BufReader};
 use std::process::{self, Command, Stdio};
@@ -55,7 +56,7 @@ impl<'a> Watcher<'a> for TailWatcher<'a> {
         let mut line = String::new();
         loop {
             if let Err(e) = self.read_line(&mut line) {
-                eprintln!("ERROR: {}", e);
+                warn!("unable to read line: {}", e);
                 sleep(self.period);
             }
             self.execute_callbacks(&line);

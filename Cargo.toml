@@ -1,6 +1,6 @@
 [package]
 name = "logwatch"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Ryan Sanden <ryan@ryansanden.com>"]
 edition = "2018"
 license = "Apache-2.0"
@@ -10,3 +10,4 @@ readme = "README.md"
 homepage = "https://github.com/rsanden/logwatch"
 
 [dependencies]
+log = "0.4"
